@@ -10,7 +10,6 @@ Module ControladorSqlServer
         'PROPIEDADES
         Property ConnectionString As String
         Property Connection As SqlConnection
-        Property DataAdapter As SqlDataAdapter
 
         ''' <summary>
         ''' Constructor
@@ -25,16 +24,27 @@ Module ControladorSqlServer
         ''' Abre la conexion
         ''' </summary>
         Public Sub AbrirConexion()
-            Connection.Open()
+            Try
+                Connection.Open()
+            Catch ex As Exception
+                System.Console.WriteLine("No se ha podido abrir la conexion con la base de datos: " & ex.Message)
+            End Try
+
         End Sub
 
         ''' <summary>
         ''' Cierra la conexion
         ''' </summary>
         Public Sub CerrarConexion()
-            Connection.Close()
+            Try
+                Connection.Close()
+            Catch ex As Exception
+                System.Console.WriteLine("No se ha podido cerrar la conexion con la base de datos: " & ex.Message)
+            End Try
         End Sub
 
+        '-----------------------------------------------------
+        '------------------METODOS DE SELECT------------------
 
         ''' <summary>
         ''' Facilita el control de una determinada tabla ya que permite obtener el objeto dataSet
@@ -42,9 +52,9 @@ Module ControladorSqlServer
         ''' <param name="query">La consulta que generara el dataset</param>
         ''' <returns>Devuelve el objeto Dataset equivalente</returns>
         Public Function GetDataset(query As String) As DataSet
+            Dim dataAdapter = New SqlDataAdapter(query, Connection)
             Dim dataSet As New DataSet
-            DataAdapter = New SqlDataAdapter(query, Connection)
-            DataAdapter.Fill(dataSet)           'Cargar registros en el dataSet
+            dataAdapter.Fill(dataSet)           'Cargar registros en el dataSet
             Return dataSet
         End Function
 
@@ -66,7 +76,8 @@ Module ControladorSqlServer
             ds.Dispose()                                'Cerrar el dataSet una vez usado
             Return registros
         End Function
-                
+
+
         ''' <summary>
         ''' Ejecuta una consulta a la Bd de un solo dato
         ''' </summary>
@@ -79,6 +90,40 @@ Module ControladorSqlServer
             Connection.Close()
             Return busqueda
         End Function
+
+
+
+        '------------------------------------------------------
+        '------------------METODOS DE CONTROL------------------
+        ''' <summary>
+        ''' Ejecuta una sentencia sql que no devuelve ningun dato
+        ''' </summary>
+        ''' <param name="sql">La instruccion sql</param>
+        Public Sub ExecuteNonQuery(sql As String)
+            Dim comando As New SqlCommand(sql, Connection)
+            Connection.Open()
+            Try
+                comando.ExecuteNonQuery()
+            Catch ex As Exception
+                System.Console.WriteLine("Error ejecutando la instruccion sql : " & ex.Message)
+            End Try
+            Connection.Close()
+        End Sub
+
+
+
+        'EJEMPLO DE LECTURA
+        'Public Sub ExecuteRead(sql As String)
+        '    Dim comando As New SqlCommand(sql, Connection)
+        '    Connection.Open()
+        '    Dim reader As SqlDataReader = comando.ExecuteReader
+        '    If reader.HasRows Then
+        '        While reader.Read
+        '            'realizar lo querido
+        '        End While
+        '    End If
+        '    Connection.Close()
+        'End Sub
 
 
     End Class
