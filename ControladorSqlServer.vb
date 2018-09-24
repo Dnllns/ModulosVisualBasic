@@ -8,6 +8,7 @@ Module ControladorSqlServer
     Public Class ControladorBD
 
         'PROPIEDADES
+        'ConnectionString = ConfigurationManager.ConnectionStrings("nombreCadena").ConnectionString
         Property ConnectionString As String
         Property Connection As SqlConnection
 
