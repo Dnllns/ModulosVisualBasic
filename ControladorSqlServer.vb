@@ -66,6 +66,19 @@ Module ControladorSqlServer
             ds.Dispose()                                'Cerrar el dataSet una vez usado
             Return registros
         End Function
+                
+        ''' <summary>
+        ''' Ejecuta una consulta a la Bd de un solo dato
+        ''' </summary>
+        ''' <param name="query"> La consuta Sql </param>
+        ''' <returns>devuelve un string que contiene el valor del escalar buscado</returns>
+        Public Function ExecuteEscalar(query As String) As String
+            Dim comando As New SqlCommand(query, Connection)
+            Connection.Open()
+            Dim busqueda As String = comando.ExecuteScalar().ToString
+            Connection.Close()
+            Return busqueda
+        End Function
 
 
     End Class
